@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8" />
+        <title>hello-wasm example</title>
+        <script src="https://pixijs.download/release/pixi.js"></script>
+    </head>
+    <body>
+        <script type="module">
+            // Basic pixi app.
+            let app = new PIXI.Application({ width: 400, height: 800 });
+            document.body.appendChild(app.view);
+
+            // Draw a sprite to prove it's working.
+            let sprite = PIXI.Sprite.from('shoe1.png');
+            app.stage.addChild(sprite);
+            
+            // Draw a graphic object to demonstrate it in javascript.
+            let obj = new PIXI.Graphics();
+            obj.beginFill(0xff0000);
+            obj.drawRect(0, 0, 100, 100);
+            app.stage.addChild(obj);
+
+            // ^^^ Passing all this to wasm looks like a pain.
+            // I could wrap it all in a utility function, and pass that.
+
+            // Update, if I do that, then I loose my Graphics object handles and I
+            // can't do culling easily.  I suppose if I could do it all in wasm,
+            // culling decisions would be faster.
+
+            // Implement rendering in js using the fastest memory access and see if it
+            // needs to go faster later.
+
+            import { init_shim } from './shim.js';
+            init_shim(app);
+            
+            // Exporting a function from shim.js to lib.rs and then calling wasm to use it.
+            import init, { alert2_test, append_number_to_body_test } from "./pkg/test_wasm.js";
+            
+            
+            init().then(() => {
+                // No variable passing.
+                alert2_test();
+                // Also with variable passing.
+                append_number_to_body_test(42);
+            });
+
+
+            
+        </script>
+    </body>
+</html>

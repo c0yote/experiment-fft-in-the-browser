@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8" />
+        <title>hello-wasm example</title>
+    </head>
+    <body>
+        <p id='target-0'>Start0</p>
+        <p id='target-1'>Start1</p>
+        <script type="module">
+            var array = new Int16Array(10);
+            for (var i = 0; i < array.length; i++) {
+                array[i] = i;
+            }
+            import init, { greet, Analysis} from "./pkg/test_wasm.js";
+            
+            if (true) {
+                // Test performance of various access strategies.
+                init().then(() => {
+                    const perfSetup = performance.now()
+                    const analysis0 = Analysis.new();
+                    const analysis1 = Analysis.new();
+                    const samples = new Int16Array(200000);
+                    for (let i = 0; i < samples.length; i++) {
+                        samples[i] = i;
+                    }
+                    console.log("Setup Took:", performance.now() - perfSetup + "ms");
+
+                    // Push Int16Array via js_sys::Int16Array
+                    // 4 ms @ 10,000,000 samples
+                    const perfPushArrayStart = performance.now()
+                    analysis1.add_samples(samples);
+                    console.log("Push Int16Array Took:", performance.now() - perfPushArrayStart + "ms");
+
+                    // Push individual i16 values
+                    // 85 ms @ 10,000,000 samples
+                    const perfOneAtATimeStart = performance.now()
+                    for (var i = 0; i < samples.length; i++) {
+                        analysis0.add_sample(samples[i]);
+                    }
+                    console.log("Push One At A Time Took:", performance.now() - perfOneAtATimeStart + "ms");
+                    console.log("Input Profile Test Complete.");
+
+                    analysis0.process();
+
+                    // Generate render from Analysis render method
+                    // 0.3 ms @ 100,000 samples
+                    const perfRenderStart = performance.now()
+                    document.getElementById('target-1').innerText = analysis1.render();
+                    console.log("Generate Render in Wasm Took:", performance.now() - perfRenderStart + "ms");
+
+                    // Generate render via js_sys::Float32Array handle
+                    // 14 ms @ 200,000 samples
+                    const perfGetArrayStart = performance.now()
+                    const output = analysis0.get_output();
+                    document.getElementById('target-0').innerText = output.join(", ");
+                    console.log("Generate Render in JS Took:", performance.now() - perfGetArrayStart + "ms");
+
+                    console.log("Render Test Complete.");
+
+                    
+                });
+            }
+            else {
+                // Test direct memory access.
+                /*
+                This does not work:
+                
+                import {memory} from "./pkg/test_wasm_bg.wasm";
+
+                You can't import from application/wasm files in modules
+                according to the HTML spec.
+
+                After looking in the js file, going to try to sneak around it here.
+                */
+                const wasmInit = await init();
+
+                const analysis0 = Analysis.new();
+                const samples = new Int16Array(200000);
+                for (let i = 0; i < samples.length; i++) {
+                    samples[i] = i;
+                }
+
+                analysis0.add_samples(samples);
+                analysis0.process();
+
+                // Generate render via js_sys::Float32Array handle
+                // 7 ms @ 200,000 samples
+                const perfRenderFromMemoryStart = performance.now()
+                const outputPtr = analysis0.get_output_ptr();
+                const outputArray = new Float32Array(wasmInit.memory.buffer, outputPtr, 200000);
+
+                document.getElementById('target-0').innerText = outputArray.join(", ");
+                console.log("Generate Render in JS from Memory Took:", performance.now() - perfRenderFromMemoryStart + "ms");
+            }
+        </script>
+    </body>
+</html>
