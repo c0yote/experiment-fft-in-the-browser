@@ -159,7 +159,7 @@ export default function AnalysisComponent(props: {
         <p>
           <span className="label">FFT:</span> {fftStatus}
         </p>
-        <button onClick={runFFT} disabled={loadingWavFile}>
+        <button onClick={runFFT} disabled={loadingWavFile || analysis !== null}>
           Run
         </button>
         <button onClick={renderFFT} disabled={analysis === null}>

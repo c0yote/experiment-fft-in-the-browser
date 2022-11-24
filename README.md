@@ -2,32 +2,22 @@
 
 Running an audio FFT in WebAssembly and visualizing with WebGL
 
+You can pull a docker image and run it locally if you want.
+
+1. Run `docker run -it --rm -p 3000:3000 -w=/work/fft-in-the-browser c0yote/experiment:fft-in-the-browser npm start`
+2. Wait for the development server to start.
+3. Browse to `http://localhost:3000`.
+4. A large wav file will load and the FFT and View options will become active.
+
+## Notes
+
 This is an weekend experiment; not production code. I offer no guarantees on anything.
 
 `/fft-in-the-browser` is a typescript react app with a component that manages the lifecycle of an audio file's fft analysis and rendering.
 
-`/wasm-fft` is a rust -> web assembly implementation of an framed fft. (there is no frame overlapping in this example)
+`/wasm-fft` is a rust -> web assembly implementation of an framed fft analysis. (there is no frame overlapping in this example)
 
-`/proofs` contains the individual problems I was exploring broken apart into their constituent pieces.
-
-## Try It
-
-You have to options, build it yourself or pull the public docker image from docker hub.
-
-You will need docker eitherway because I used it to control the build environment.
-
-### Run It
-
-### Build & Run It
-
-1. Have Docker installed.
-2. Run `./build-run.sh`.
-3. Wait for build to complete and development server to start.
-4. Browse to `http://localhost:3000`
-
-This will launch build containers and then a container to run the development server.
-
-A large wav file will load and the FFT and View options will become active.
+`/proofs` contains the individual problems I was exploring, broken apart into their constituent pieces.
 
 ## Other Stuff
 
