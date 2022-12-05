@@ -13,7 +13,7 @@ You can pull a docker image and run it locally if you want.
 
 ## Notes
 
-This is an weekend experiment; not production code. I offer no guarantees on anything.
+This is a weekend experiment; not production code. I offer no guarantees on anything.
 
 `/fft-in-the-browser` is a typescript react app with a component that manages the lifecycle of an audio file's fft analysis and rendering.
 
