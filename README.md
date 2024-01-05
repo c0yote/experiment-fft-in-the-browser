@@ -4,7 +4,7 @@ Running an audio FFT in WebAssembly and visualizing with WebGL
 
 ![Screenshot](proofs/screenshot.png?raw=true "Title")
 
-You can pull a docker image and run it locally if you want.
+You can pull a docker image and run it locally if you want. (OSX only)
 
 1. Run `docker run -it --rm -p 3000:3000 -w=/work/fft-in-the-browser c0yote/experiment:fft-in-the-browser npm start`
 2. Wait for the development server to start.
